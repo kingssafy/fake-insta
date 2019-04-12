@@ -1,0 +1,12 @@
+<blockquote class="blockquote text-left">
+  {% if post.image %}
+  <img src="{{ post.image.url }}" class="img-thumbnail"></img>
+  {% endif %}
+  <p class="mb-0">{{ post.content }}</p>
+  <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+  <a href="{% url 'posts:update' post.pk %}" class="btn btn-primary">EDIT</a>
+  <form action="{% url 'posts:delete' post.pk %}" method="POST" class="form-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-warning">DELETE</button>
+  </form>
+</blockquote>
