@@ -1,7 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1>LIST</h1>
+
+<div class="container row">
 {% for post in posts %}
+<div class="col-4">
 {% include 'posts/_post.html' %}
+</div>
+
 {% endfor post %}
+</div>
 {% endblock content %}

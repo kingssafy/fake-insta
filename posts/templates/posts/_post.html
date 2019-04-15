@@ -1,12 +1,36 @@
 <blockquote class="blockquote text-left">
-  {% if post.image %}
-  <img src="{{ post.image.url }}" class="img-thumbnail"></img>
+  {% if post.image_set %}
+  <div class="card-header"><h5 class="card-text">{{ post.user }}</h5></div>
+  <div id="post{{ post.pk }}" class="carousel slide" data-ride="carousel">
+    <ol class="carousel-indicators">
+      {% for image in post.image_set.all %}
+      <li data-target="#post{{ post.pk }}" data-slide-to="{{forloop.counter0}}" class="{% if forloop.counter == 1 %}active{% endif %}"></li>
+      {% endfor %}
+    </ol>
+    <div class="carousel-inner">
+      {% for image in post.image_set.all %}
+      <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
+        <img src="{{image.file.url}}" class="d-block w-100" alt="{{ image.file }}">
+      </div>
+      {% endfor image %}
+    </div>
+    <a class="carousel-control-prev" href="#post{{ post.pk }}" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+    <a class="carousel-control-next" href="#post{{ post.pk }}" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+  </div>
   {% endif %}
   <p class="mb-0">{{ post.content }}</p>
-  <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+  <footer class="blockquote-footer">Author: <cite title="Source Title">{{ post.user }}</cite></footer>
+  {% if user == post.user %}
   <a href="{% url 'posts:update' post.pk %}" class="btn btn-primary">EDIT</a>
   <form action="{% url 'posts:delete' post.pk %}" method="POST" class="form-inline">
     {% csrf_token %}
     <button type="submit" class="btn btn-warning">DELETE</button>
   </form>
+  {% endif%}
 </blockquote>

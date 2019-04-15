@@ -1,27 +1,39 @@
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
 from .models import Post
-from .form import PostForm
+from .form import PostForm, ImageForm
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def list(request):
     posts = get_list_or_404(Post.objects.order_by('-pk'))
     context = dict(posts=posts)
     return render(request, 'posts/list.html', context)
-    
+
+
+@login_required
 def create(request):
     if request.method == 'POST':
-        post_form = PostForm(request.POST, request.FILES)
+        post_form = PostForm(request.POST)
         if post_form.is_valid():
-            post_form.save()
+            post = post_form.save(commit = False)
+            post.user = request.user
+            post.save()
+            for image in request.FILES.getlist('file'):
+                request.FILES['file'] = image
+                image_form = ImageForm(files=request.FILES)
+                if image_form.is_valid():
+                    image = image_form.save(commit=False)
+                    image.post = post
+                    image.save()
             return redirect('posts:list')
     else:
         post_form = PostForm()
-    context = dict(post_form = post_form)
+    context = dict(post_form = post_form, image_form = ImageForm())
     return render(request, 'posts/form.html', context)
     
 def update(request, post_pk):
     post = get_object_or_404(Post, id=post_pk)
-    if request.method == 'POST':
+    if request.method == 'POST' and post.user == request.user:
         post_form = PostForm(request.POST, instance=post)
         if post_form.is_valid():
             post_form.save()
@@ -33,6 +45,7 @@ def update(request, post_pk):
     
 def delete(request, post_pk):
     post = get_object_or_404(Post, id=post_pk)
-    if request.method == 'POST':
-        post.delete()
+    if post.user == request.user:
+        if request.method == 'POST':
+            post.delete()
     return redirect('posts:list')
