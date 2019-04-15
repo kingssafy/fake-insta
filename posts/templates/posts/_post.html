@@ -1,6 +1,8 @@
 <blockquote class="blockquote text-left">
   {% if post.image_set %}
-  <div class="card-header"><h5 class="card-text">{{ post.user }}</h5></div>
+  <div class="card-header">
+    <h5 class="card-text">{{ post.user }}</h5>
+  </div>
   <div id="post{{ post.pk }}" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators">
       {% for image in post.image_set.all %}
@@ -26,7 +28,24 @@
   {% endif %}
   <p class="mb-0">{{ post.content }}</p>
   <footer class="blockquote-footer">Author: <cite title="Source Title">{{ post.user }}</cite></footer>
-  {% if user == post.user %}
+  <footer class="card-footer">
+    <ul>
+          {% for comment in post.comment_set.all %}
+          <p class="card-text"><strong>{{ comment.user }}</strong> {{ comment.content }}</p>
+      <li>{{ comment.content }} - 작성자: {{ comment.user }} {% if comment.user == user %}<a href="{% url 'posts:comment_delete' comment.pk %}">댓글지우기</a>{% endif %}</li>
+      {% empty %}
+      <li>no comment added yet</li>
+      {% endfor %}
+    </ul>
+  </footer>
+  <div class="card-footer">
+    <form action="{% url 'posts:comment_create' post.pk %}" method="POST">
+     {% csrf_token %} 
+     {{ comment_form }} 
+     <input type="submit" value="댓글작성" class="btn btn-light">
+    </form>
+  </div>
+   {% if user == post.user %}
   <a href="{% url 'posts:update' post.pk %}" class="btn btn-primary">EDIT</a>
   <form action="{% url 'posts:delete' post.pk %}" method="POST" class="form-inline">
     {% csrf_token %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <input type="hidden" name="post_pk" value="{{ post_pk }}"/>
+    <button type="submit" class="btn btn-primary">submit</button>
+    <button type="reset" class="btn btn-primary">reset</button>
+    <button type="link" class="btn btn-primary" href="{% url 'posts:list'%}">BACK</button>
+</form>
+{% endblock content %}

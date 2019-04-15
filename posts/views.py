@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect, get_list_or_404, get_object_or_404
-from .models import Post
-from .form import PostForm, ImageForm
+from .models import Post, Comment
+from .form import PostForm, ImageForm, CommentForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 # Create your views here.
 
 def list(request):
     posts = get_list_or_404(Post.objects.order_by('-pk'))
-    context = dict(posts=posts)
+    comment_form = CommentForm()
+    context = dict(posts=posts, 
+    comment_form=comment_form)
     return render(request, 'posts/list.html', context)
 
 
@@ -48,4 +51,23 @@ def delete(request, post_pk):
     if post.user == request.user:
         if request.method == 'POST':
             post.delete()
+    return redirect('posts:list')
+    
+@login_required    
+@require_POST
+def comment_create(request, post_pk):
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        form = form.save(commit=False)
+        form.user = request.user
+        form.post_id = post_pk
+        form.save()
+        return redirect('posts:list')
+
+@login_required
+@require_POST
+def comment_delete(request, comment_pk):
+    comment = get_object_or_404(Comment, id=comment_pk)
+    if request.user == comment.user:
+        comment.delete()
     return redirect('posts:list')
