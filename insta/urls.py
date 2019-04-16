@@ -18,12 +18,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from accounts import views as accounts_views
 
 
 urlpatterns = [
-        path('posts/', include('posts.urls')),
+    path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
     path('admin/', admin.site.urls),
+    path('<str:username>/', accounts_views.people, name="people"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

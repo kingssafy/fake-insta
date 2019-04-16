@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import get_user_model
 
 # Create your views here.
 
@@ -27,15 +28,20 @@ def login(request):
         if form.is_valid():
             auth_login(request, form.get_user())
             return redirect(request.POST.get("next") or 'posts:list')
-    else:
-        next = request.GET.get('next', '')
-        form = AuthenticationForm()
-        context = {
-            'next': next,
-            'form': form,
-        }
-        return render(request, 'accounts/login.html', context)
+    next = request.GET.get('next', '')
+    form = AuthenticationForm()
+    context = {
+        'next': next,
+        'form': form,
+    }
+    return render(request, 'accounts/login.html', context)
         
 def logout(request):
     auth_logout(request)
     return redirect('posts:list')
+    
+    
+def people(request, username):
+    people = get_object_or_404(get_user_model(), username=username)
+    context = dict(people=people)
+    return render(request, 'accounts/people.html', context);

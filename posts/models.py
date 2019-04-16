@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 class Post(models.Model):
     content = models.TextField()
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    like_users = models.ManyToManyField(get_user_model(), related_name='like_posts', blank=True)
     def __str__(self):
         return self.content
         

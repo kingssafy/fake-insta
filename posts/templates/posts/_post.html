@@ -2,11 +2,18 @@
   {% if post.image_set %}
   <div class="card-header">
     <h5 class="card-text">{{ post.user }}</h5>
+    <a href="{% url 'posts:like' post.pk %}" class="card-link">
+       {% if user in post.like_users.all %}
+       <i class="fas fa-heart fa-lg" style="color:crimson;"></i>
+       {% else %}
+       <i class="fas fa-heart fa-lg" style="color:black;"></i>
+       {% endif %}
+    </a>
   </div>
   <div id="post{{ post.pk }}" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators">
       {% for image in post.image_set.all %}
-      <li data-target="#post{{ post.pk }}" data-slide-to="{{forloop.counter0}}" class="{% if forloop.counter == 1 %}active{% endif %}"></li>
+      <li data-target="#post{{ post.pk }}" data-slide-to="{{forloop.counter0}}" class="{% if forloop.counter == 1 and post.first %}active{% endif %}"></li>
       {% endfor %}
     </ol>
     <div class="carousel-inner">
